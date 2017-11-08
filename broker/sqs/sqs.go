@@ -204,6 +204,10 @@ func (b *sqsBroker) Init(opts ...broker.Option) error {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
+	if cfg, ok := b.options.Context.Value(AWS_CONFIG_CONTEXT_KEY).(*aws.Config); ok {
+		sess.Config = cfg
+	}
+
 	svc := sqs.New(sess)
 	b.svc = svc
 	b.session = sess
@@ -334,5 +338,15 @@ func NewBroker(opts ...broker.Option) broker.Broker {
 
 	return &sqsBroker{
 		options: options,
+	}
+}
+
+const (
+	AWS_CONFIG_CONTEXT_KEY = "AWS_CONFIG_CONTEXT_KEY"
+)
+
+func AwsConfig(config *aws.Config) broker.Option {
+	return func(o *broker.Options) {
+		o.Context = context.WithValue(o.Context, AWS_CONFIG_CONTEXT_KEY, config)
 	}
 }
