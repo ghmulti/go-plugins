@@ -204,6 +204,10 @@ func (b *sqsBroker) Init(opts ...broker.Option) error {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
+	if b.options.Addrs != nil && len(b.options.Addrs) > 0 {
+		sess.Config.Endpoint = aws.String(b.options.Addrs[0])
+	}
+
 	svc := sqs.New(sess)
 	b.svc = svc
 	b.session = sess
